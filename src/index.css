@@ -99,3 +99,13 @@
 .auth-success-ring {
   animation: success-ring 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Hide default browser scrollbars globally for a cleaner, premium native look */
+::-webkit-scrollbar {
+  display: none;
+}
+
+html, body {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
