@@ -16,31 +16,24 @@ Elite LinkedIn ghostwriting and content strategy system that generates algorithm
 
 ## Architecture
 
-This app runs as a small full-stack project:
+This app runs as a full-stack project:
 - React + Vite frontend
-- Express backend (`/api/v1/...`) for secure Groq calls
-- Python ghostwriting engine (`linkedin_ghostwriter.py`)
+- Express backend (`/api/v1/...`) for secure AI agent invocations
 
 ## Quick Start
 
-**Prerequisites:** Node.js 20+, Python 3.8+
+**Prerequisites:** Node.js 20+
 
-### Frontend & Backend
+### Installation & Run
 1. Install dependencies:
    `npm install`
 2. Copy `.env.example` to `.env.local` and set:
    - `GROQ_API_KEY`
    - `SUPABASE_URL`, `SUPABASE_ANON_KEY`
    - `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
-3. Start frontend + backend together:
+3. Start the application:
    `npm run dev`
 4. Open: `http://localhost:3000`
-
-### Python Ghostwriter
-1. Install Python dependencies:
-   `pip install -r requirements.txt`
-2. Run the ghostwriter:
-   `python linkedin_ghostwriter.py`
 
 ## Security Baseline
 
@@ -60,34 +53,6 @@ This app runs as a small full-stack project:
 
 Deploy the Vite app to Vercel, and set the same env vars in Vercel Project Settings:
 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` and `GROQ_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`.
-
-## Ghostwriter Usage
-
-The Python ghostwriter can be used in two modes:
-
-### With Writing Samples
-```python
-ghostwriter = LinkedInGhostwriter()
-result = ghostwriter.create_post_with_samples(
-    samples=["your writing samples here"],
-    who_they_are="Business coach and founder",
-    target_audience="Tech founders",
-    goal="Generate leads",
-    content_style="Educator",
-    experience="Your real experience or story"
-)
-```
-
-### Without Writing Samples
-```python
-result = ghostwriter.create_post_without_samples(
-    who_they_are="SaaS founder and growth expert",
-    target_audience="B2B founders", 
-    goal="Build authority",
-    content_style="Contrarian",
-    experience="Your real experience or story"
-)
-```
 
 ## 2026 LinkedIn Algorithm Rules
 
