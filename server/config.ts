@@ -35,5 +35,8 @@ export const config = {
   requireAuth: (process.env.REQUIRE_AUTH || 'true').toLowerCase() === 'true',
   rateLimitWindowMs: parseNumber(process.env.RATE_LIMIT_WINDOW_MS, 60_000),
   rateLimitMaxRequests: parseNumber(process.env.RATE_LIMIT_MAX_REQUESTS, 30),
+  ipRateLimitWindowMs: parseNumber(process.env.IP_RATE_LIMIT_WINDOW_MS, 60_000),
+  ipRateLimitMaxRequests: parseNumber(process.env.IP_RATE_LIMIT_MAX_REQUESTS, 60),
   requestBodyLimit: process.env.REQUEST_BODY_LIMIT || '250kb',
 };
+

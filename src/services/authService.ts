@@ -36,6 +36,7 @@ export async function signUp(email: string, password: string): Promise<AuthResul
   const { data, error } = await supabase.auth.signUp({
     email: normalizedEmail,
     password,
+    options: { emailRedirectTo: window.location.origin },
   });
 
   if (error) return { ok: false, error: error.message };
@@ -85,6 +86,8 @@ export async function getCurrentUser(): Promise<AuthSession | null> {
   };
 }
 
+let lastLoadedUpdatedAt: string | null = null;
+
 /** Load workspace data for the currently logged-in user. */
 export async function loadUserWorkspace(): Promise<any | null> {
   const session = await getCurrentUser();
@@ -92,7 +95,7 @@ export async function loadUserWorkspace(): Promise<any | null> {
 
   const { data, error } = await supabase
     .from("workspaces")
-    .select("workspace")
+    .select("workspace, updated_at")
     .eq("user_id", session.userId)
     .maybeSingle();
 
@@ -101,7 +104,11 @@ export async function loadUserWorkspace(): Promise<any | null> {
     return null;
   }
 
-  return (data as any)?.workspace ?? null;
+  if (data) {
+    lastLoadedUpdatedAt = (data as any).updated_at ?? null;
+    return (data as any).workspace ?? null;
+  }
+  return null;
 }
 
 /** Upsert workspace data for the currently logged-in user. */
@@ -109,16 +116,57 @@ export async function saveUserWorkspace(workspace: any): Promise<void> {
   const session = await getCurrentUser();
   if (!session) return;
 
+  // 1. Enforce client-side size check (500KB limit)
+  const serialized = JSON.stringify(workspace);
+  if (serialized.length > 500000) {
+    console.warn("Workspace size exceeds the 500KB limit. Save aborted.");
+    // Warn the user via alert if in browser environment
+    if (typeof window !== "undefined") {
+      alert("Error: Your workspace is too large (exceeds the 500KB limit). Please delete old draft posts or history to make it smaller.");
+    }
+    return;
+  }
+
+  // 2. Collision detection: check if database has a newer update
+  try {
+    const { data: checkData } = await supabase
+      .from("workspaces")
+      .select("updated_at")
+      .eq("user_id", session.userId)
+      .maybeSingle();
+
+    const dbUpdatedAt = checkData?.updated_at;
+    if (dbUpdatedAt && lastLoadedUpdatedAt && dbUpdatedAt !== lastLoadedUpdatedAt) {
+      if (typeof window !== "undefined") {
+        const overwrite = confirm(
+          "Warning: Your workspace has been updated on another device or tab since you loaded it.\n\n" +
+          "Do you want to overwrite those changes? (Click Cancel to reload and fetch the latest changes)."
+        );
+        if (!overwrite) {
+          window.location.reload();
+          return;
+        }
+      }
+    }
+  } catch (checkError) {
+    console.warn("Failed to perform collision check", checkError);
+  }
+
   const row: WorkspaceRow = {
     user_id: session.userId,
     workspace,
   };
 
-  const { error } = await supabase
+  const { data: upsertData, error } = await supabase
     .from("workspaces")
-    .upsert(row, { onConflict: "user_id" });
+    .upsert(row, { onConflict: "user_id" })
+    .select("updated_at")
+    .maybeSingle();
 
   if (error) {
     console.warn("Failed to save workspace", error.message);
+  } else if (upsertData?.updated_at) {
+    lastLoadedUpdatedAt = upsertData.updated_at;
   }
 }
+

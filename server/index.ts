@@ -23,7 +23,23 @@ app.get('/api/v1/health', (_req, res) => {
 
 app.post('/api/v1/agents/run', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    let rateLimitKey = getClientIp(req);
+    const clientIp = getClientIp(req);
+    const ipLimitResult = checkRateLimit(`ip:${clientIp}`, config.ipRateLimitWindowMs, config.ipRateLimitMaxRequests);
+
+    if (ipLimitResult.limited) {
+      res.setHeader('Retry-After', String(ipLimitResult.retryAfter));
+      res.setHeader('X-RateLimit-Limit', String(config.ipRateLimitMaxRequests));
+      res.setHeader('X-RateLimit-Remaining', '0');
+      res.setHeader('X-RateLimit-Reset', String(ipLimitResult.resetAt));
+      return res.status(429).json({
+        ok: false,
+        error: {
+          code: 'RATE_LIMITED',
+          message: 'Too many requests from this IP. Please wait before trying again.',
+        },
+      });
+    }
+
     let user: any = null;
 
     if (config.requireAuth) {
@@ -34,26 +50,29 @@ app.post('/api/v1/agents/run', async (req: Request, res: Response, next: NextFun
           error: { code: 'UNAUTHENTICATED', message: 'Missing or invalid access token.' },
         });
       }
-      rateLimitKey = `user:${user.id}`;
+
+      const userLimitResult = checkRateLimit(`user:${user.id}`, config.rateLimitWindowMs, config.rateLimitMaxRequests);
+      
+      res.setHeader('X-RateLimit-Limit', String(config.rateLimitMaxRequests));
+      res.setHeader('X-RateLimit-Remaining', String(userLimitResult.remaining));
+      res.setHeader('X-RateLimit-Reset', String(userLimitResult.resetAt));
+
+      if (userLimitResult.limited) {
+        res.setHeader('Retry-After', String(userLimitResult.retryAfter));
+        return res.status(429).json({
+          ok: false,
+          error: {
+            code: 'RATE_LIMITED',
+            message: 'Too many requests for this account. Please wait before trying again.',
+          },
+        });
+      }
+    } else {
+      res.setHeader('X-RateLimit-Limit', String(config.ipRateLimitMaxRequests));
+      res.setHeader('X-RateLimit-Remaining', String(ipLimitResult.remaining));
+      res.setHeader('X-RateLimit-Reset', String(ipLimitResult.resetAt));
     }
 
-    const limitResult = checkRateLimit(rateLimitKey, config.rateLimitWindowMs, config.rateLimitMaxRequests);
-    
-    // Set standard rate limiting headers
-    res.setHeader('X-RateLimit-Limit', String(config.rateLimitMaxRequests));
-    res.setHeader('X-RateLimit-Remaining', String(limitResult.remaining));
-    res.setHeader('X-RateLimit-Reset', String(limitResult.resetAt));
-
-    if (limitResult.limited) {
-      res.setHeader('Retry-After', String(limitResult.retryAfter));
-      return res.status(429).json({
-        ok: false,
-        error: {
-          code: 'RATE_LIMITED',
-          message: 'Too many requests. Please wait before trying again.',
-        },
-      });
-    }
 
     const body = req.body as { agentId?: unknown; payload?: unknown };
 

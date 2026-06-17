@@ -770,8 +770,11 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<'strategy' | 'history' | 'settings'>('strategy');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const displayName =
-    workspace.settings?.profile?.fullName || 'Growth Leader';
+  const rawDisplayName = workspace.settings?.profile?.fullName || 'Growth Leader';
+  const displayName = rawDisplayName
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
   const displayRole =
     workspace.settings?.profile?.role || 'Founder';
 
@@ -2040,8 +2043,8 @@ export default function App() {
                         <PenTool className="w-3 h-3 text-blue-500" />
                         <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Posts</span>
                       </div>
-                      <p className="text-base font-display font-black text-slate-900">{postsCreated}</p>
-                      {postsCreated > 0 && <p className="text-[8px] text-emerald-500 font-bold mt-0.5">↑ Active</p>}
+                      <p className="text-base font-display font-black text-slate-900">{draftsCount}</p>
+                      {draftsCount > 0 && <p className="text-[8px] text-emerald-500 font-bold mt-0.5">↑ Active</p>}
                     </div>
                     <div className="text-center p-2 rounded-lg bg-slate-50/70">
                       <div className="flex items-center justify-center gap-1 mb-0.5">
@@ -2062,7 +2065,7 @@ export default function App() {
                   </div>
 
                   {/* Posting Activity Heatmap */}
-                  <div className="space-y-2.5 max-w-[340px] mx-auto">
+                  <div className="space-y-2.5 w-full max-w-[340px] mx-auto">
                     <div className="flex items-center gap-1.5">
                       <Calendar className="w-3 h-3 text-slate-400" />
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Posting Activity — Last 28 Days</span>
