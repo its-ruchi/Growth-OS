@@ -1334,6 +1334,9 @@ export default function App() {
 
   const handleLogout = async () => {
     await authService.logout();
+    // Clear the shared local workspace so the next user to log in on this
+    // browser does not inherit the previous user's data via global migration.
+    localStorage.removeItem('growth-os-workspace');
     setCurrentUser(null);
     setWorkspace({ settings: DEFAULT_SETTINGS, isLinkedinConnected: false });
     setStep('auth');
@@ -1519,7 +1522,7 @@ export default function App() {
                     )}
                     {onboardingStep === 5 && (
                       <p className="text-sm text-slate-500 mt-1.5 leading-relaxed">
-                        Paste 1–3 posts or pieces of writing you're proud of. Skip if you don't have any.
+                        Paste even 1 post you've written and every draft will sound like you — same hooks, rhythm, and style. You can still skip, but this is the fastest way to make posts feel yours.
                       </p>
                     )}
                     {onboardingStep === 6 && (
@@ -1740,7 +1743,7 @@ export default function App() {
                         {[0, 1, 2].map((idx) => (
                           <FloatingTextarea
                             key={idx}
-                            label={idx === 0 ? 'Writing sample 1 (or type skip)' : `Writing sample ${idx + 1}`}
+                            label={idx === 0 ? 'Paste a post you wrote (recommended)' : `Writing sample ${idx + 1}`}
                             value={onboardingData.writing_samples[idx]}
                             onChange={(e) => {
                               const next = [...onboardingData.writing_samples];
