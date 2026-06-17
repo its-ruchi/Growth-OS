@@ -24,6 +24,38 @@ type WorkspaceRow = {
   updated_at?: string;
 };
 
+function friendlyAuthError(message: string, mode: 'login' | 'signup'): string {
+  const msg = message.toLowerCase();
+
+  if (msg.includes('invalid login credentials') || msg.includes('invalid credentials')) {
+    return 'Incorrect email or password.';
+  }
+  if (msg.includes('email not confirmed')) {
+    return 'Your email is not confirmed yet. Check your inbox or try signing up again.';
+  }
+  if (msg.includes('too many requests') || msg.includes('rate limit')) {
+    return 'Too many attempts. Please wait a moment and try again.';
+  }
+  if (mode === 'signup') {
+    if (msg.includes('already registered') || msg.includes('already been registered') || msg.includes('already exists')) {
+      return 'An account with this email already exists. Try logging in instead.';
+    }
+    if (msg.includes('password') && (msg.includes('6') || msg.includes('characters') || msg.includes('short'))) {
+      return 'Password must be at least 6 characters.';
+    }
+    if (msg.includes('invalid email') || msg.includes('invalid format') || msg.includes('validate email')) {
+      return 'Please enter a valid email address.';
+    }
+  }
+  if (mode === 'login') {
+    if (msg.includes('user not found') || msg.includes('no user')) {
+      return 'No account found with that email.';
+    }
+  }
+
+  return message;
+}
+
 export async function signUp(email: string, password: string): Promise<AuthResult> {
   const normalizedEmail = email.trim().toLowerCase();
   if (!normalizedEmail || !normalizedEmail.includes("@")) {
@@ -33,21 +65,26 @@ export async function signUp(email: string, password: string): Promise<AuthResul
     return { ok: false, error: "Password must be at least 6 characters." };
   }
 
-  const { data, error } = await supabase.auth.signUp({
-    email: normalizedEmail,
-    password,
-    options: { emailRedirectTo: window.location.origin },
+  // Backend creates the user with email_confirm: true, skipping confirmation email.
+  const apiBase = import.meta.env.VITE_API_BASE_URL || "";
+  const signupRes = await fetch(`${apiBase}/api/v1/auth/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: normalizedEmail, password }),
   });
 
-  if (error) return { ok: false, error: error.message };
-  // If email confirmations are enabled in Supabase, session may be null until verified.
-  if (!data.session) {
-    return {
-      ok: false,
-      info: "Check your email to confirm your account, then log in.",
-    };
+  const signupJson = await signupRes.json();
+  if (!signupJson.ok) {
+    return { ok: false, error: friendlyAuthError(signupJson.error?.message || "Signup failed.", 'signup') };
   }
 
+  // Auto sign-in after account creation.
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: normalizedEmail,
+    password,
+  });
+
+  if (error) return { ok: false, error: friendlyAuthError(error.message, 'signup') };
   const userEmail = data.user?.email || normalizedEmail;
   return { ok: true, email: userEmail };
 }
@@ -66,7 +103,7 @@ export async function login(email: string, password: string): Promise<AuthResult
     password,
   });
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: friendlyAuthError(error.message, 'login') };
   const userEmail = data.user?.email || normalizedEmail;
   return { ok: true, email: userEmail };
 }

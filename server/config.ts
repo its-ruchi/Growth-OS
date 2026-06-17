@@ -14,6 +14,7 @@ const parseNumber = (value: string | undefined, fallback: number) => {
 const groqApiKey = process.env.GROQ_API_KEY;
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!groqApiKey) {
   throw new Error(
@@ -32,6 +33,7 @@ export const config = {
   groqApiKey,
   supabaseUrl,
   supabaseAnonKey,
+  supabaseServiceRoleKey,
   requireAuth: (process.env.REQUIRE_AUTH || 'true').toLowerCase() === 'true',
   rateLimitWindowMs: parseNumber(process.env.RATE_LIMIT_WINDOW_MS, 60_000),
   rateLimitMaxRequests: parseNumber(process.env.RATE_LIMIT_MAX_REQUESTS, 30),

@@ -869,9 +869,16 @@ export default function App() {
   useEffect(() => {
     // When entering Settings (or after a reset), sync the draft form with saved settings.
     if (activeTab !== 'settings') return;
-    setDraftSettings(normalizeSettings(workspace.settings));
+    const base = normalizeSettings(workspace.settings);
+    if (!base.profile.bio) {
+      base.profile.bio =
+        (workspace as any).offer_positioning?.one_liner ||
+        (workspace as any).icp_profile?.primary_pain ||
+        '';
+    }
+    setDraftSettings(base);
     setSettingsDirty(false);
-  }, [activeTab, workspace.settings]);
+  }, [activeTab, workspace.settings, (workspace as any).offer_positioning]);
 
   const handleOnboardingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -926,7 +933,7 @@ export default function App() {
             ...DEFAULT_SETTINGS.profile,
             fullName: onboardingData.user.fullName || '',
             role: onboardingData.user.role || '',
-            bio: '',
+            bio: (response.data as any)?.offer_positioning?.one_liner || onboardingData.user.coreOffer || '',
           },
           billing: {
             ...DEFAULT_SETTINGS.billing,
@@ -2885,7 +2892,7 @@ export default function App() {
               </div>
               <div className="hidden lg:block overflow-hidden flex-1">
                 <p className="text-xs font-bold text-slate-900 truncate">{displayName || 'User'}</p>
-                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest truncate">
+                <p className="text-[9px] text-slate-400 font-medium truncate">
                   {currentUser || displayRole}
                 </p>
               </div>
