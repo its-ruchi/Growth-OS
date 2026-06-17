@@ -199,6 +199,22 @@ MOST IMPORTANT INSTRUCTION:
 You are writing a LinkedIn post that must stop someone
 mid-scroll. Study the structure below and follow it exactly.
 
+MATCH THE USER'S OWN WRITING STYLE (HIGHEST PRIORITY):
+Check INPUT_JSON.writing_samples.
+- If it contains 1 or more non-empty samples, those samples are your PRIMARY
+  style and format reference. They outrank the generic examples further down.
+  Silently analyze them and mirror, as closely as you can:
+  * hook style and length (how their first line opens)
+  * average post length and number of paragraphs
+  * line length and the rhythm of short vs. long lines
+  * paragraph/whitespace pattern (do they use single lines? blank lines?)
+  * emoji, punctuation, capitalization and formatting habits
+  * how they open and sign off, and their level of formality
+  The goal: a reader who knows this person should feel "they wrote this."
+  Still ground the CONTENT in the user's topic and business context — never copy
+  the specific stories, names, or details from their samples; only mirror FORMAT and VOICE.
+- If writing_samples is empty, fall back to voice_card + the formula and examples below.
+
 THE LINKEDIN POST FORMULA THAT ACTUALLY WORKS:
 
 LINE 1 — THE HOOK (most important line you will write):
@@ -264,53 +280,136 @@ No numbering.
 No markdown.
 Just clean plain text with line breaks.
 
-EXAMPLE OF PERFECT OUTPUT BODY:
-"5 of my 6 cats are gone.
+EXAMPLES OF PERFECT OUTPUT BODY BY VOICE STYLE (FORMAT & LAYOUT ONLY):
 
-i'm not sure i've fully processed that.
+CRITICAL WARNING: These are structure, pacing, and layout templates only. You must ground the actual generated post content 100% in the user's specific business context, niche, and raw material inputs. Never hallucinate or copy the specific stories, locations (like London, Spiti, etc.), brand names (like Clay, Notion, etc.), or personal details from the examples below unless they are explicitly provided in the user's input payload.
 
-i've been a cat person my whole life.
-not by choice at first.
-my parents knew i'd get lonely as an only child —
-so there was always something around.
+Use these examples to guide the tone, rhythm, line lengths, and structure for the selected voice:
 
-then they became mine.
-really mine.
+--- STORYTELLER EXAMPLE ---
+"I spent 3 years building in secret.
 
-and one by one, most of them left.
+No launch, no feedback, no audience.
 
-but Evie is still here.
-named wrong from day one (long story).
-and somehow the most loyal creature
-i've ever known.
+Just pure code and hubris.
 
-people say cats aren't loyal.
-they aren't affectionate.
-they won't love you back.
+We launched to crickets on a Tuesday in October.
 
-i think those people have never sat alone at 2am
-with a cat who refuses to leave your side.
+That was my biggest mistake.
 
-you don't need them to perform love.
-you just feel it.
+I thought if I built the perfect product, they would come.
 
-that's something i'm still learning
-to do with people too.
+They didn't care.
 
-cat people — tell me about yours.
-dog people, you can fight me in the comments."
+We had to pivot or die.
 
-STUDY THIS EXAMPLE:
-- Hook is specific and has tension (5 of 6 gone)
-- Second line is short and personal
-- Lines vary in length deliberately
-- "Evie" — one specific name makes it real
-- "2am" — one specific time makes it real
-- Lesson is never stated — felt naturally
-- Ends with warmth and invitation to comment
-- Zero corporate language
-- Zero hashtags in body
-- Zero emojis except at end if personality calls for it
+So we started building in public instead.
+
+Sharing the ugly commits.
+
+The server crashes.
+
+The actual user metrics.
+
+Now, we don't build features without 10 customers paying upfront.
+
+If you're building in secret right now:
+
+Stop coding. Go talk to one user.
+
+Founders — what's the hardest pivot you've had to make?"
+
+--- OPINIONATOR EXAMPLE ---
+"Most advice about networking is garbage.
+
+You don't need 'more connections' on LinkedIn.
+
+You need better filters.
+
+Having 50,000 connections who don't care is a vanity metric.
+
+It hurts your reach.
+
+Instead, build a circle of 50 active peers.
+
+People who comment, challenge your ideas, and tag you.
+
+Broad reach gets views. Close peers build pipelines.
+
+Disagree? Tell me why in the comments."
+
+--- FACT PRESENTER EXAMPLE ---
+"We analyzed 1,200 startup landing pages.
+
+The result?
+
+82% of them fail the '5-second test'.
+
+If a visitor can't explain what you do in 5 seconds, they bounce.
+
+Most founders write clever headlines instead of clear ones.
+
+They use words like 'synergize' or 'revolutionize'.
+
+Clear beats clever. Every single time.
+
+Try this: ask a stranger to look at your hero section for 5 seconds.
+
+Then ask them what you sell.
+
+If they get it wrong, rewrite it today."
+
+--- FRAMEWORKER EXAMPLE ---
+"I grew our newsletter to 10k subscribers in 90 days.
+
+Most people spend months trying to figure out sponsorships.
+
+Here is the exact 3-step framework we used:
+
+1. The Value Hook
+
+Offer one micro-solution in your welcome email. Not a generic PDF.
+
+2. The 2-Tier Referral
+
+Give a referral link for a free resource, then a second tier for 1:1 consulting.
+
+3. The Cross-Promotion Loop
+
+Partner with 3 newsletters of similar size every single week.
+
+Simple. Repeatable. Scalable.
+
+Save this post for your next campaign."
+
+--- F-BOMBER EXAMPLE ---
+"everyone is pretending they have it all figured out.
+
+truth is, most founders I talk to are terrified.
+
+we worry about cash flow at 3am.
+
+we double-check our emails for typos.
+
+we feel like fraud every time we hire someone smarter.
+
+i used to hide this.
+
+i wanted to look like the perfect, polished CEO.
+
+but pretending is exhausting.
+
+it's okay to not know the answer.
+
+it's okay to say 'i'm figuring this out'.
+
+the best founders aren't perfect.
+
+they are just the ones who don't quit when it gets messy.
+
+if you're struggling today:
+
+you aren't alone. we are all in this."
 ---
 
 STEP 1 — SELECT VOICE:
@@ -337,23 +436,21 @@ If false: generate an ai_image_prompt for this post.
 STEP 4 — VOICE RULES:
 
 STORYTELLER:
-- Hook: 2 lines max, 55 chars each
-- Use: moment of tension, admission, or unexpected outcome
-- Structure: MRS (Mistake → Realization → Shift)
-- Tone: lowercase preferred, personal, vulnerable
-- No bullet points — pure narrative only
-- Must include one specific number or named detail
-- 150-200 words
-- CTA: one genuine question tied to the story
+- Hook: 1-2 lines max. Use a highly relatable moment or a series progress tracker (e.g., "Day X of Y") derived from the user's raw experience.
+- Use: An actual moment of tension, career/project conflict, or major decision/leap taken by the user.
+- Structure:
+  * Option A (Conflict): State a positive or pivotal moment -> Describe the tension between two competing priorities/worlds -> Describe how these worlds intersected or collided -> Add specific, raw, or self-deprecating details (mistakes, funny anecdotes, or specific tools/names) from the user's raw materials -> Conclude with a broader, relatable lesson.
+  * Option B (Milestone/Series): State the milestone progress and immediate quantitative results (impressions, followers) -> Share the dramatic start or backstory behind it -> Describe the user's mindset (the fear, excitement, or conviction) -> Conclude with an authentic takeaway.
+- Tone: Highly human, conversational, personal, admitting mistakes.
+- Spacing: Put a blank line (\n\n) between every single sentence/line. Keep lines short.
+- CTA: Warm invitation to discuss or drop a DM.
 
 OPINIONATOR:
-- Hook: direct accusation technique
-- Must trigger: disagreement or self-recognition
-- Structure: bold claim → evidence → alternative → reframe
-- Never hedge: no "I think" or "maybe"
-- Specific always beats general
-- 150-200 words
-- CTA: invite disagreement — "Agree or disagree?"
+- Hook: A direct diagnostic claim or accusation that triggers self-recognition regarding a common frustration in their industry (grounded in their ICP's pain).
+- Structure (Rapid-Fire Diagnosis): Diagnostic claim -> Authority statement of how many times the user has seen this -> Numbered list of 4-5 common mistakes their clients make -> Summarize the root cause (focusing on strategy over superficial fixes) -> Call-to-Action.
+- Tone: Bold, confident, expert but helpful.
+- Spacing: Put a blank line (\n\n) between every single sentence/line.
+- CTA: Invite disagreement, drop a DM, or let's talk.
 
 FACT PRESENTER:
 - Hook: most surprising number or observation
@@ -361,34 +458,31 @@ FACT PRESENTER:
 - Structure: Data → Deeper insight → So-what → Implication
 - Every number must be real or framed as personal observation
 - Never fabricate statistics
-- 150-200 words
+- Spacing: Put a blank line (\n\n) between every single sentence/line.
 - CTA: ask them to share their own data or experience
 
 FRAMEWORKER:
-- Hook: result first — "I did X. Here's the exact framework."
-- Result-first hooks outperform process-first by 40%
-- Structure: 3 opener lines → 1 core insight why people fail
-  → 3-5 numbered steps → 1 power ending
-- Every step must be actionable today, not someday
-- Include carousel_slides array in output
-- 150-220 words
-- CTA: "Save this." — highest performing CTA for this format
+- Hook: Start with age, milestone, or a specific result first (e.g., "I did X in Y days").
+- Structure (Timeline Lessons): Hook -> Dramatic contrast of past struggles/failures vs current success -> List of 5-11 lessons for the user's younger self or target audience.
+- Each lesson must have:
+  * A bold, actionable title
+  * A 2-3 sentence personal, grounded commentary with bullet points if applicable
+- Tone: Inspirational, humble but authoritative, practical.
+- Spacing: Put a blank line (\n\n) between every single sentence/line.
+- CTA: "Save this." or ask them to share their own rules.
 
 F-BOMBER:
-- Hook: stolen thought technique
-  Say what reader thinks but hasn't admitted out loud
-- Structure: stolen thought → uncomfortable truth
-  → personal admission → truth bomb → human landing
-- Lowercase always — no exceptions
-- No bullet points — pure prose only
-- Personal admission must feel uncomfortable to publish
-- 130-180 words — shorter is more powerful here
-- CTA: invite shared experience, never beg for engagement
-- End with a human landing, not a neat lesson
+- Hook: Start with a raw, lowercase vulnerability or unexpected admission regarding the reality of their industry or job.
+- Structure (Unfiltered List): Hook -> List of 3 key items (using lowercase, single-word headers) -> Under each item, use a contrasting logic: "Don't do X... don't fake Y... but do Z".
+- Tone: All-lowercase always. Extremely raw, conversational, and direct.
+- Spacing: Put a blank line (\n\n) between every single sentence/line.
+- CTA: Short question inviting shared experience, or a raw signature.
+
 
 UNIVERSAL RULES — apply to all 5 voices:
 - No em-dashes — use short sentences instead
-- White space between every 1-2 lines — always
+- Word count: 120-220 words. Ensure the post is detailed, fully fleshed out, and comprehensive (never just 3-4 sentences total).
+- Strict spacing: Put a blank line (\n\n) between every single sentence/line. Never output consecutive lines separated by a single newline \n.
 - No external links in post body — first comment only
 - Zero corporate language (see banned phrases above)
 - Must sound like a human wrote it at 11pm
@@ -403,13 +497,13 @@ If any answer is no — rewrite that section.
 
 BODY FIELD FORMATTING — CRITICAL:
 When writing the body field in JSON:
-- Use \n\n (double newline) between every paragraph.
-- Use \n (single newline) between lines within the same paragraph.
-- NEVER output the body as one flat block of text.
-- NEVER use literal line breaks inside JSON strings — use \n and \n\n escape sequences.
+- Use \n\n (double newline) between every single sentence/line.
+- On LinkedIn, every single sentence or bullet point must be its own paragraph.
+- NEVER separate two sentences/lines in the post with a single \n. Always use \n\n.
+- NEVER use literal line breaks inside JSON strings — use \n\n escape sequences.
 
 Example of correct body format:
-"5 of my 6 cats are gone.\n\ni'm not sure i've fully processed that.\n\ni've been a cat person my whole life.\nnot by choice at first.\nmy parents knew i'd get lonely.\n\nbut Evie is still here.\n\ntell me about yours."
+"I spent 3 years building in secret.\n\nNo launch, no feedback, no audience.\n\nJust pure code and hubris.\n\nWe launched to crickets on a Tuesday in October."
 
 CRITICAL — CTA FIELD RULE:
 The cta field in JSON output must ALWAYS be an empty string "".
@@ -500,12 +594,12 @@ VERSION C - "Story-Driven"
 ---
 
 RULES:
-- 120-220 words each
-- Strong first-line hook (critical)
-- Short paragraphs (1-2 lines max)
-- No cliches or generic AI phrasing
-- Make it feel human, opinionated, and specific
-- Match the user's tone and audience
+- Length: 120-220 words each. Ensure the posts are detailed and fully fleshed out (never just 3-4 sentences).
+- Spacing: You must put a blank line (\n\n) between every single sentence/line. Never separate sentences with a single \n. Every line/sentence must end with \n\n.
+- Structure: Every version must have a strong hook (Line 1 under 8 words), a curious pull (Line 2), short rhythmic lines, and a natural, emergent lesson.
+- No cliches or generic AI phrasing.
+- Make it feel human, opinionated, and specific.
+- Match the user's tone and audience.
 
 OPTIONAL ADD-ON:
 For each version, also generate 3 alternative hooks.
@@ -519,6 +613,7 @@ OUTPUT MAPPING (IMPORTANT - keep JSON paste-ready):
 - Put the diagnosis text in data.diagnosis.
 - Put the improvement plan text in data.improvement_strategy.
 - data.post.body MUST contain ONLY the post text (no labels like "DIAGNOSIS:" or "VERSION A:" and no markdown headings).
+- EVERY post body in the JSON output MUST have double newlines (\n\n) between every single sentence/line.
 
 OUTPUT data SHAPE:
 {
@@ -530,19 +625,19 @@ OUTPUT data SHAPE:
     { "angle": "", "text": "" }
   ],
   "post": {
-    "body": "<VERSION A post ONLY - paste-ready, newline-separated paragraphs>",
+    "body": "<VERSION A post ONLY - paste-ready, double-newline-separated (\\n\\n) sentences>",
     "word_count": 0,
     "specifics_used": []
   },
   "alternative_versions": [
     {
       "style": "More Contrarian & Bold",
-      "body": "<VERSION B full post>",
+      "body": "<VERSION B full post - double-newline-separated (\\n\\n) sentences>",
       "hook_options": ["", "", ""]
     },
     {
       "style": "Story-Driven",
-      "body": "<VERSION C full post>",
+      "body": "<VERSION C full post - double-newline-separated (\\n\\n) sentences>",
       "hook_options": ["", "", ""]
     }
   ],

@@ -770,8 +770,11 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<'strategy' | 'history' | 'settings'>('strategy');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const displayName =
-    workspace.settings?.profile?.fullName || 'Growth Leader';
+  const rawDisplayName = workspace.settings?.profile?.fullName || 'Growth Leader';
+  const displayName = rawDisplayName
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
   const displayRole =
     workspace.settings?.profile?.role || 'Founder';
 
@@ -1331,6 +1334,9 @@ export default function App() {
 
   const handleLogout = async () => {
     await authService.logout();
+    // Clear the shared local workspace so the next user to log in on this
+    // browser does not inherit the previous user's data via global migration.
+    localStorage.removeItem('growth-os-workspace');
     setCurrentUser(null);
     setWorkspace({ settings: DEFAULT_SETTINGS, isLinkedinConnected: false });
     setStep('auth');
@@ -1516,7 +1522,7 @@ export default function App() {
                     )}
                     {onboardingStep === 5 && (
                       <p className="text-sm text-slate-500 mt-1.5 leading-relaxed">
-                        Paste 1–3 posts or pieces of writing you're proud of. Skip if you don't have any.
+                        Paste even 1 post you've written and every draft will sound like you — same hooks, rhythm, and style. You can still skip, but this is the fastest way to make posts feel yours.
                       </p>
                     )}
                     {onboardingStep === 6 && (
@@ -1737,7 +1743,7 @@ export default function App() {
                         {[0, 1, 2].map((idx) => (
                           <FloatingTextarea
                             key={idx}
-                            label={idx === 0 ? 'Writing sample 1 (or type skip)' : `Writing sample ${idx + 1}`}
+                            label={idx === 0 ? 'Paste a post you wrote (recommended)' : `Writing sample ${idx + 1}`}
                             value={onboardingData.writing_samples[idx]}
                             onChange={(e) => {
                               const next = [...onboardingData.writing_samples];
@@ -2040,8 +2046,8 @@ export default function App() {
                         <PenTool className="w-3 h-3 text-blue-500" />
                         <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Posts</span>
                       </div>
-                      <p className="text-base font-display font-black text-slate-900">{postsCreated}</p>
-                      {postsCreated > 0 && <p className="text-[8px] text-emerald-500 font-bold mt-0.5">↑ Active</p>}
+                      <p className="text-base font-display font-black text-slate-900">{draftsCount}</p>
+                      {draftsCount > 0 && <p className="text-[8px] text-emerald-500 font-bold mt-0.5">↑ Active</p>}
                     </div>
                     <div className="text-center p-2 rounded-lg bg-slate-50/70">
                       <div className="flex items-center justify-center gap-1 mb-0.5">
@@ -2062,7 +2068,7 @@ export default function App() {
                   </div>
 
                   {/* Posting Activity Heatmap */}
-                  <div className="space-y-2.5 max-w-[340px] mx-auto">
+                  <div className="space-y-2.5 w-full max-w-[340px] mx-auto">
                     <div className="flex items-center gap-1.5">
                       <Calendar className="w-3 h-3 text-slate-400" />
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Posting Activity — Last 28 Days</span>
