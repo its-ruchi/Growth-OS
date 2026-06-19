@@ -484,8 +484,8 @@ const AuthModal = ({
       } else {
         setAuthError(result.error || 'Something went wrong.');
       }
-    } catch {
-      setAuthError('An unexpected error occurred.');
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.');
     } finally {
       setAuthLoading(false);
     }

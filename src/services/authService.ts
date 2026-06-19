@@ -67,13 +67,18 @@ export async function signUp(email: string, password: string): Promise<AuthResul
 
   // Backend creates the user with email_confirm: true, skipping confirmation email.
   const apiBase = import.meta.env.VITE_API_BASE_URL || "";
-  const signupRes = await fetch(`${apiBase}/api/v1/auth/signup`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: normalizedEmail, password }),
-  });
+  let signupJson: any;
+  try {
+    const signupRes = await fetch(`${apiBase}/api/v1/auth/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: normalizedEmail, password }),
+    });
+    signupJson = await signupRes.json();
+  } catch {
+    return { ok: false, error: "Could not reach the server. Check your connection and try again." };
+  }
 
-  const signupJson = await signupRes.json();
   if (!signupJson.ok) {
     return { ok: false, error: friendlyAuthError(signupJson.error?.message || "Signup failed.", 'signup') };
   }
