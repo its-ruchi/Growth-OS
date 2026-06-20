@@ -58,7 +58,7 @@ export default async function handler(req: any, res: any) {
   // User exists but may be unconfirmed — find and confirm them, update password.
   if (error.message.toLowerCase().includes("already")) {
     let page = 1;
-    let found = null;
+    let found: { id: string; email?: string } | null = null;
 
     while (!found) {
       const { data: listData, error: listError } = await adminClient.auth.admin.listUsers({
